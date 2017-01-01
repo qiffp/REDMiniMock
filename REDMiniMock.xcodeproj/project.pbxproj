@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		226098BB1E18A70D00A021DA /* REDMiniMockTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 226098BA1E18A70D00A021DA /* REDMiniMockTests.m */; };
 		226219101E16F9B8007A1C3D /* REDMiniMock.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 226219061E16F9B8007A1C3D /* REDMiniMock.framework */; };
 		226219171E16F9B8007A1C3D /* REDMiniMock.h in Headers */ = {isa = PBXBuildFile; fileRef = 226219091E16F9B8007A1C3D /* REDMiniMock.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		226219831E16FA7B007A1C3D /* REDMiniMock.h in Headers */ = {isa = PBXBuildFile; fileRef = 226219091E16F9B8007A1C3D /* REDMiniMock.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -44,6 +45,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		226098BA1E18A70D00A021DA /* REDMiniMockTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = REDMiniMockTests.m; sourceTree = "<group>"; };
 		226219061E16F9B8007A1C3D /* REDMiniMock.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = REDMiniMock.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		226219091E16F9B8007A1C3D /* REDMiniMock.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = REDMiniMock.h; sourceTree = "<group>"; };
 		2262190A1E16F9B8007A1C3D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -132,6 +134,7 @@
 			children = (
 				226219161E16F9B8007A1C3D /* Info.plist */,
 				226219B01E170247007A1C3D /* REDMockTests.m */,
+				226098BA1E18A70D00A021DA /* REDMiniMockTests.m */,
 			);
 			path = REDMiniMockTests;
 			sourceTree = "<group>";
@@ -306,6 +309,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				226098BB1E18A70D00A021DA /* REDMiniMockTests.m in Sources */,
 				226219B11E170247007A1C3D /* REDMockTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -546,6 +550,7 @@
 				2262191C1E16F9B8007A1C3D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		2262191D1E16F9B8007A1C3D /* Build configuration list for PBXNativeTarget "REDMiniMockTests" */ = {
 			isa = XCConfigurationList;
@@ -554,6 +559,7 @@
 				2262191F1E16F9B8007A1C3D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		226219801E16FA5F007A1C3D /* Build configuration list for PBXNativeTarget "REDMiniMock Mac" */ = {
 			isa = XCConfigurationList;
@@ -562,6 +568,7 @@
 				226219821E16FA5F007A1C3D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

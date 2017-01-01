@@ -9,12 +9,12 @@
 #import <XCTest/XCTest.h>
 #import <REDMiniMock/REDMiniMock.h>
 
-@interface REDTestClass : NSObject
+@interface REDMockTestClass : NSObject
 @property (readonly, strong) id property;
 - (instancetype)initWithProperty:(id)property;
 @end
 
-@implementation REDTestClass
+@implementation REDMockTestClass
 
 - (instancetype)initWithProperty:(id)property
 {
@@ -27,11 +27,11 @@
 
 @end
 
-@protocol REDTestProtocol <NSObject>
+@protocol REDMockTestProtocol <NSObject>
 - (NSString *)doStuff;
 @end
 
-@protocol REDTestProtocol2 <NSObject>
+@protocol REDMockTestProtocol2 <NSObject>
 - (NSString *)doStuff2;
 @end
 
@@ -44,7 +44,7 @@
 {
 	NSObject *obj = [REDMock mockClass:[NSObject class]
 							 selectors:@{
-										 REDMockMethod(isEqual:): ^BOOL(id _self, id obj) { return YES; }
+										 RMMMethod(isEqual:): ^BOOL(id _self, id obj) { return YES; }
 										 }];
 	XCTAssertTrue([obj isKindOfClass:[NSObject class]]);
 	XCTAssertTrue([obj isEqual:@"mock (yeah) ing (yeah) bird (yeah) yeah (yeah)"]);
@@ -52,54 +52,54 @@
 
 - (void)testMockClassWithInit
 {
-	REDTestClass *obj = [REDMock mockClass:[REDTestClass class]
+	REDMockTestClass *obj = [REDMock mockClass:[REDMockTestClass class]
 								 initBlock:^id(Class cls) {
 									 return [[cls alloc] initWithProperty:@"mocks in 2016 LUL"];
 								 } selectors:@{
-											   REDMockMethod(isEqual:): ^BOOL(id _self, id obj) { return YES; }
+											   RMMMethod(isEqual:): ^BOOL(id _self, id obj) { return YES; }
 											   }];
-	XCTAssertTrue([obj isKindOfClass:[REDTestClass class]]);
+	XCTAssertTrue([obj isKindOfClass:[REDMockTestClass class]]);
 	XCTAssertTrue([obj isEqual:@"mock (yeah) ing (yeah) bird (yeah) yeah (yeah)"]);
 	XCTAssertEqualObjects(obj.property, @"mocks in 2016 LUL");
 }
 
 - (void)testMockProtocol
 {
-	id<REDTestProtocol> obj = [REDMock mockProtocol:@protocol(REDTestProtocol)
+	id<REDMockTestProtocol> obj = [REDMock mockProtocol:@protocol(REDMockTestProtocol)
 										  selectors:@{
-													  REDMockMethod(doStuff): ^NSString *(id _self) { return @"mock"; }
+													  RMMMethod(doStuff): ^NSString *(id _self) { return @"mock"; }
 													  }];
-	XCTAssertTrue([obj conformsToProtocol:@protocol(REDTestProtocol)]);
+	XCTAssertTrue([obj conformsToProtocol:@protocol(REDMockTestProtocol)]);
 	XCTAssertEqualObjects([obj doStuff], @"mock");
 }
 
 - (void)testMockMultipleProtocols
 {
-	id<REDTestProtocol, REDTestProtocol2> obj = [REDMock mockProtocols:@[@protocol(REDTestProtocol), @protocol(REDTestProtocol2)]
+	id<REDMockTestProtocol, REDMockTestProtocol2> obj = [REDMock mockProtocols:@[@protocol(REDMockTestProtocol), @protocol(REDMockTestProtocol2)]
 															 selectors:@{
-																		 REDMockMethod(doStuff): ^NSString *(id _self) { return @"mock"; },
-																		 REDMockMethod(doStuff2): ^NSString *(id _self) { return @"yeah"; }
+																		 RMMMethod(doStuff): ^NSString *(id _self) { return @"mock"; },
+																		 RMMMethod(doStuff2): ^NSString *(id _self) { return @"yeah"; }
 																		 }];
-	XCTAssertTrue([obj conformsToProtocol:@protocol(REDTestProtocol)]);
-	XCTAssertTrue([obj conformsToProtocol:@protocol(REDTestProtocol2)]);
+	XCTAssertTrue([obj conformsToProtocol:@protocol(REDMockTestProtocol)]);
+	XCTAssertTrue([obj conformsToProtocol:@protocol(REDMockTestProtocol2)]);
 	XCTAssertEqualObjects([obj doStuff], @"mock");
 	XCTAssertEqualObjects([obj doStuff2], @"yeah");
 }
 
 - (void)testMockClassAndProtocolsWithInit
 {
-	REDTestClass<REDTestProtocol, REDTestProtocol2> *obj = [REDMock mockClass:[REDTestClass class]
-																	protocols:@[@protocol(REDTestProtocol), @protocol(REDTestProtocol2)]
+	REDMockTestClass<REDMockTestProtocol, REDMockTestProtocol2> *obj = [REDMock mockClass:[REDMockTestClass class]
+																	protocols:@[@protocol(REDMockTestProtocol), @protocol(REDMockTestProtocol2)]
 																	initBlock:^id(Class cls) {
 																		return [[cls alloc] initWithProperty:@"mocks in 2016 LUL"];
 																	} selectors:@{
-																				  REDMockMethod(isEqual:): ^BOOL(id _self, id obj) { return YES; },
-																				  REDMockMethod(doStuff): ^NSString *(id _self) { return @"mock"; },
-																				  REDMockMethod(doStuff2): ^NSString *(id _self) { return @"yeah"; }
+																				  RMMMethod(isEqual:): ^BOOL(id _self, id obj) { return YES; },
+																				  RMMMethod(doStuff): ^NSString *(id _self) { return @"mock"; },
+																				  RMMMethod(doStuff2): ^NSString *(id _self) { return @"yeah"; }
 																				  }];
-	XCTAssertTrue([obj isKindOfClass:[REDTestClass class]]);
-	XCTAssertTrue([obj conformsToProtocol:@protocol(REDTestProtocol)]);
-	XCTAssertTrue([obj conformsToProtocol:@protocol(REDTestProtocol2)]);
+	XCTAssertTrue([obj isKindOfClass:[REDMockTestClass class]]);
+	XCTAssertTrue([obj conformsToProtocol:@protocol(REDMockTestProtocol)]);
+	XCTAssertTrue([obj conformsToProtocol:@protocol(REDMockTestProtocol2)]);
 	XCTAssertTrue([obj isEqual:@"mock (yeah) ing (yeah) bird (yeah) yeah (yeah)"]);
 	XCTAssertEqualObjects([obj doStuff], @"mock");
 	XCTAssertEqualObjects([obj doStuff2], @"yeah");

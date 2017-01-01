@@ -9,11 +9,26 @@
 #import <REDMiniMock/REDMiniMockFunctions.h>
 #import <REDMiniMock/MABlockForwarding.h>
 
-#import <objc/runtime.h>
 #import <objc/message.h>
 
 static void *REDMockMockedSelectorsKey;
 static void *REDMockJanitorKey;
+
+static BOOL REDMiniMock_shouldCreateClassMethod(Class cls, SEL sel, id block) {
+	NSString *types = [NSString stringWithUTF8String:BlockSig(block)];
+	types = [[types componentsSeparatedByCharactersInSet:[NSCharacterSet decimalDigitCharacterSet]] componentsJoinedByString:@""];
+	unichar firstArgType = [types characterAtIndex:[types rangeOfString:@"?"].location + 1];
+	BOOL firstArgIsClass = firstArgType == '#';
+	BOOL firstArgIsId = firstArgType == '@';
+	
+	/*
+	 * If block's first arg is a class, it's assumed to be a class method.
+	 * If block's first arg is an id, but there's no instance method and there is a class method, it's assumed to be a class method.
+	 * Otherwise, it's assumed to be an instance method.
+	 */
+
+	return firstArgIsClass || (firstArgIsId && !class_getInstanceMethod(cls, sel) && class_getClassMethod(cls, sel));
+}
 
 void REDMiniMock_setMockedSelectors(Class cls, NSDictionary<NSString *, NSValue *> *mockedSelectors) {
 	objc_setAssociatedObject(cls, REDMockMockedSelectorsKey, mockedSelectors, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
@@ -42,13 +57,15 @@ Class REDMiniMock_setupMockClass(Class cls, NSArray<Protocol *> *protocols, NSDi
 	}
 	
 	NSMutableDictionary<NSString *, NSValue *> *imps = [NSMutableDictionary new];
-	[selectors enumerateKeysAndObjectsUsingBlock:^(NSString *selectorName, id block, BOOL *stop) {
+	[selectors enumerateKeysAndObjectsUsingBlock:^(NSString *selName, id block, BOOL *stop) {
 		IMP imp = imp_implementationWithBlock(block);
-		imps[selectorName] = [NSValue valueWithPointer:imp];
-		class_replaceMethod(mockClass, NSSelectorFromString(selectorName), imp, BlockSig(block));
+		imps[selName] = [NSValue valueWithPointer:imp];
+		
+		SEL sel = NSSelectorFromString(selName);
+		Class impClass = REDMiniMock_shouldCreateClassMethod(mockClass, sel, block) ? object_getClass(mockClass) : mockClass;
+		class_replaceMethod(impClass, sel, imp, BlockSig(block));
 	}];
 	REDMiniMock_setMockedSelectors(mockClass, imps);
 	
 	return mockClass;
 }
-
