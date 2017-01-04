@@ -14,10 +14,48 @@
 static void *REDMockMockedSelectorsKey;
 static void *REDMockJanitorKey;
 
+static const char *block_sanitizedTypes(id block) {
+	const char *types = BlockSig(block);
+	char *sanitizedTypes;
+	
+	NSUInteger j = 0;
+	for (NSUInteger i = 0; types[i]; i++) {
+		char ch = types[i];
+		if (!isdigit(ch)) {
+			sanitizedTypes[j++] = ch;
+		}
+	}
+	sanitizedTypes[j] = '\0';
+	
+	return sanitizedTypes;
+}
+
+static char block_firstArgType(id block) {
+	NSUInteger firstArgIndex = 0;
+	NSUInteger angleBracketDepth = 0;
+	const char *sanitizedTypes = block_sanitizedTypes(block);
+	
+	for (NSUInteger i = 0; sanitizedTypes[i]; i++) {
+		char ch = sanitizedTypes[i];
+		if (ch == '?') {
+			if (sanitizedTypes[i + 1] == '<') {
+				continue;
+			} else if (angleBracketDepth == 0) {
+				firstArgIndex = i + 1;
+				break;
+			}
+		} else if (ch == '<') {
+			angleBracketDepth++;
+		} else if (ch == '>') {
+			angleBracketDepth--;
+		}
+	}
+	
+	return sanitizedTypes[firstArgIndex];
+}
+
 static BOOL REDMiniMock_shouldCreateClassMethod(Class cls, SEL sel, id block) {
-	NSString *types = [NSString stringWithUTF8String:BlockSig(block)];
-	types = [[types componentsSeparatedByCharactersInSet:[NSCharacterSet decimalDigitCharacterSet]] componentsJoinedByString:@""];
-	unichar firstArgType = [types characterAtIndex:[types rangeOfString:@"?"].location + 1];
+	char firstArgType = block_firstArgType(block);
 	BOOL firstArgIsClass = firstArgType == '#';
 	BOOL firstArgIsId = firstArgType == '@';
 	

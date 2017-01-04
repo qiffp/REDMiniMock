@@ -20,7 +20,7 @@ FOUNDATION_EXPORT const unsigned char REDMiniMockVersionString[];
 
 #define RMMMethod(sel) NSStringFromSelector(@selector(sel))
 
-#define RMMSuper(self, returntype, sel, args...) ({	\
+#define RMMSuper(self, returntype, sel, ...) ({	\
 	/* Go two levels up since `self` is the dynamically created mock class */	\
 	Class superclass = [[self performSelector:@selector(superclass)] performSelector:@selector(superclass)];	\
 	struct objc_super s;	\
@@ -29,5 +29,5 @@ FOUNDATION_EXPORT const unsigned char REDMiniMockVersionString[];
 	} else {	\
 		s = (struct objc_super){ self, superclass };	\
 	}	\
-	((returntype(*)(struct objc_super *, SEL, ...))objc_msgSendSuper)(&s, sel, args);	\
+	((returntype(*)(struct objc_super *, SEL, ...))objc_msgSendSuper)(&s, sel, ##__VA_ARGS__);	\
 })
