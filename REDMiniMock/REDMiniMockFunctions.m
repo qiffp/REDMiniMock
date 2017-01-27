@@ -11,6 +11,12 @@
 
 #import <objc/message.h>
 
+typedef NS_ENUM(NSInteger, REDMockArgType) {
+	REDMockArgTypeOther,
+	REDMockArgTypeClass,
+	REDMockArgTypeId
+};
+
 static void *REDMockMockedSelectorsKey;
 static void *REDMockJanitorKey;
 
@@ -30,7 +36,7 @@ static const char *block_sanitizedTypes(id block) {
 	return sanitizedTypes;
 }
 
-static char block_firstArgType(id block) {
+static REDMockArgType block_firstArgType(id block) {
 	NSUInteger firstArgIndex = 0;
 	NSUInteger angleBracketDepth = 0;
 	const char *sanitizedTypes = block_sanitizedTypes(block);
@@ -51,21 +57,25 @@ static char block_firstArgType(id block) {
 		}
 	}
 	
-	return sanitizedTypes[firstArgIndex];
+	char firstArg = sanitizedTypes[firstArgIndex];
+	if (firstArg == '#') {
+		return REDMockArgTypeClass;
+	} else if (firstArg == '@' && sanitizedTypes[firstArgIndex + 1] != '"') {
+		return REDMockArgTypeId;
+	} else {
+		return REDMockArgTypeOther;
+	}
 }
 
 static BOOL REDMiniMock_shouldCreateClassMethod(Class cls, SEL sel, id block) {
-	char firstArgType = block_firstArgType(block);
-	BOOL firstArgIsClass = firstArgType == '#';
-	BOOL firstArgIsId = firstArgType == '@';
-	
 	/*
 	 * If block's first arg is a class, it's assumed to be a class method.
 	 * If block's first arg is an id, but there's no instance method and there is a class method, it's assumed to be a class method.
 	 * Otherwise, it's assumed to be an instance method.
 	 */
 
-	return firstArgIsClass || (firstArgIsId && !class_getInstanceMethod(cls, sel) && class_getClassMethod(cls, sel));
+	REDMockArgType firstArgType = block_firstArgType(block);
+	return firstArgType == REDMockArgTypeClass || (firstArgType == REDMockArgTypeId && !class_getInstanceMethod(cls, sel) && class_getClassMethod(cls, sel));
 }
 
 void REDMiniMock_setMockedSelectors(Class cls, NSDictionary<NSString *, NSValue *> *mockedSelectors) {
